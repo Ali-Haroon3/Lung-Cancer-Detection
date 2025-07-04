@@ -1,0 +1,14 @@
+# Streamlit Community Cloud Requirements
+streamlit>=1.46.1
+tensorflow>=2.14.0
+numpy<2.0
+pandas>=2.3.0
+scikit-learn>=1.7.0
+matplotlib>=3.10.3
+seaborn>=0.13.2
+plotly>=6.2.0
+opencv-python>=4.11.0.86
+pydicom>=3.0.1
+psycopg2-binary>=2.9.10
+sqlalchemy>=2.0.41
+pillow>=10.0.0
