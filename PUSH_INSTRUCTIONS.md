@@ -2,27 +2,21 @@
 
 To ensure commits show your Ali-Haroon3 account as the author:
 
-## Step 1: Configure Git with Your Account
-First, set up Git with your personal credentials:
-```bash
-git config user.name "Ali-Haroon3"
-git config user.email "YOUR_GITHUB_EMAIL@gmail.com"
-```
-*Replace YOUR_GITHUB_EMAIL with your actual GitHub email*
+## Git Config is Locked - Use Direct Author Method
 
-## Step 2: Push the Changes
-### Option A: Use the Script (Easiest)
-```bash
-./push_to_github.sh
-```
-*Make sure to edit the email in the script first*
+Since Git config is locked in Replit, use the --author flag to set your account:
+
+### Option A: Use the Updated Script
+1. Edit `push_to_github.sh` and replace `your.email@gmail.com` with your GitHub email
+2. Run: `./push_to_github.sh`
 
 ### Option B: Manual Commands
 ```bash
 git add .
-git commit -m "Clean up project and prepare for deployment"
+git commit --author="Ali-Haroon3 <YOUR_EMAIL@gmail.com>" -m "Clean up project and prepare for deployment"
 git push origin main
 ```
+*Replace YOUR_EMAIL@gmail.com with your actual GitHub email*
 
 ## What Will Happen
 - ✅ All cleaned files will be added to your repository
