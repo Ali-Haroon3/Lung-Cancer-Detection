@@ -1,16 +1,23 @@
-# 🚀 Quick Push to Your Ali-Haroon3 GitHub
+# 🚀 Push with Your Personal GitHub Account
 
-Your repository is already connected! Here's how to push the cleaned project:
+To ensure commits show your Ali-Haroon3 account as the author:
 
-## Option 1: Use the Script (Easiest)
-Run this command in the Replit shell:
+## Step 1: Configure Git with Your Account
+First, set up Git with your personal credentials:
+```bash
+git config user.name "Ali-Haroon3"
+git config user.email "YOUR_GITHUB_EMAIL@gmail.com"
+```
+*Replace YOUR_GITHUB_EMAIL with your actual GitHub email*
+
+## Step 2: Push the Changes
+### Option A: Use the Script (Easiest)
 ```bash
 ./push_to_github.sh
 ```
+*Make sure to edit the email in the script first*
 
-## Option 2: Manual Commands
-If you prefer to run commands manually:
-
+### Option B: Manual Commands
 ```bash
 git add .
 git commit -m "Clean up project and prepare for deployment"
