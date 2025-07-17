@@ -34,7 +34,7 @@ Use these exact settings:
 - **Start Command:** `streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true`
 
 **Advanced Settings:**
-- **Environment:** `Python 3.11.9` (specified in runtime.txt)
+- **Environment:** `Python 3.11.9` (specified in .python-version)
 - **Instance Type:** `Free` (default)
 
 ### 4. Add Database (Optional)
@@ -70,6 +70,7 @@ For full functionality with data persistence:
 
 **Build fails?**
 - Check that `requirements_streamlit.txt` exists in your repository
+- Ensure `.python-version` file exists with `3.11.9`
 - Ensure the build command is exactly: `pip install -r requirements_streamlit.txt`
 
 **App won't start?**
