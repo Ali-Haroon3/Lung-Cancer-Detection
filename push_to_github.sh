@@ -6,7 +6,7 @@ echo "🚀 Pushing cleaned Lung Cancer Detection AI to Ali-Haroon3 GitHub..."
 git add .
 
 # Commit with your personal account info directly in the commit command
-git commit --author="Ali-Haroon3 <your.email@gmail.com>" -m "Clean up project: Remove unnecessary files and prepare for deployment
+git commit --author="Ali-Haroon3 <aliharoon643@gmail.com>" -m "Clean up project: Remove unnecessary files and prepare for deployment
 
 - Removed all Replit-specific documentation files
 - Cleaned up cached Python files and temporary directories  

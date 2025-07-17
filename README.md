@@ -172,3 +172,6 @@ This application is for research and educational purposes only. It should not be
 ---
 
 **Built with ❤️ for advancing medical AI research**
+
+---
+*Project cleaned and optimized for deployment - Ali-Haroon3*
