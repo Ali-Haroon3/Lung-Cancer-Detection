@@ -9,7 +9,7 @@ An advanced deep learning application for lung cancer detection using Convolutio
 
 ## 🚀 Live Demo
 
-**[Try the Application](https://your-app-name.onrender.com)** *(Deploy to get your link)*
+**[Deploy Your Own](RENDER_DEPLOYMENT.md)** - Follow the guide to get your app live in 10 minutes!
 
 ## 📋 Features
 
