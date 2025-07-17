@@ -34,7 +34,7 @@ Use these exact settings:
 - **Start Command:** `streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true`
 
 **Advanced Settings:**
-- **Environment:** `Python 3.11` (recommended)
+- **Environment:** `Python 3.11.9` (specified in runtime.txt)
 - **Instance Type:** `Free` (default)
 
 ### 4. Add Database (Optional)
