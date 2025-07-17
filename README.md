@@ -1,174 +1,174 @@
-# Lung Cancer Detection CNN Application
+# 🫁 Lung Cancer Detection AI
 
-A comprehensive Streamlit-based web application for lung cancer detection using deep learning and medical imaging analysis.
+An advanced deep learning application for lung cancer detection using Convolutional Neural Networks (CNN) with medical imaging analysis.
 
-## 🏥 Overview
+![Python](https://img.shields.io/badge/python-v3.8+-blue.svg)
+![Streamlit](https://img.shields.io/badge/streamlit-v1.46+-red.svg)
+![TensorFlow](https://img.shields.io/badge/tensorflow-v2.17+-orange.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-This application provides medical professionals with AI-assisted diagnostic capabilities for lung cancer detection from CT scans and chest X-rays. Built with modern deep learning frameworks and featuring a complete medical workflow management system.
+## 🚀 Live Demo
 
-## ✨ Key Features
+**[Try the Application](https://your-app-name.onrender.com)** *(Deploy to get your link)*
 
-### Deep Learning Models
-- **CNN Architectures**: ResNet50, DenseNet121, EfficientNetB0
-- **Transfer Learning**: Pre-trained models fine-tuned for medical imaging
-- **Real-time Training**: Live progress monitoring with early stopping
-- **Model Persistence**: Automatic saving and loading of trained models
+## 📋 Features
 
-### Medical Image Processing
-- **DICOM Support**: Native DICOM file reading and metadata extraction
-- **Image Preprocessing**: Standardized resizing, normalization, and augmentation
-- **Data Validation**: Medical imaging quality checks and format validation
-- **Batch Processing**: Support for multiple image analysis
+### 🔬 Medical AI Capabilities
+- **Deep Learning Models**: ResNet50, DenseNet121, EfficientNetB0 with transfer learning
+- **Medical Image Processing**: DICOM files, CT scans, chest X-rays
+- **Real-time Predictions**: Single image and batch processing
+- **Class Activation Maps**: Visual interpretability for medical decisions
 
-### Comprehensive Interface
-- **Data Upload**: Individual files, ZIP archives, and sample datasets
-- **Model Training**: Interactive configuration with hyperparameter tuning
-- **Model Evaluation**: Medical-specific metrics (sensitivity, specificity, AUC)
-- **Prediction System**: Single image and batch prediction with confidence scoring
-- **Database Dashboard**: Real-time analytics and performance monitoring
+### 💾 Data Management
+- **PostgreSQL Integration**: Complete medical workflow tracking
+- **Training History**: Full model performance analytics
+- **Audit Trail**: Comprehensive logging for medical compliance
+- **Data Export**: Results export for clinical workflows
 
-### Database Integration
-- **PostgreSQL Backend**: Complete relational schema for medical workflows
-- **Data Persistence**: Full tracking of datasets, models, training sessions, and results
-- **Audit Trail**: Comprehensive logging of all user actions and system operations
-- **Analytics**: Interactive visualizations and performance metrics
+### 🖥️ User Interface
+- **Interactive Web App**: Streamlit-based medical interface
+- **Multi-page Design**: Organized workflow for medical professionals
+- **Real-time Visualization**: Training progress and results
+- **Mobile Responsive**: Access from any device
 
-## 🚀 Quick Start
+## 🏥 Medical Use Case
+
+This application assists medical professionals in:
+- **Screening**: Early detection support for lung cancer
+- **Education**: Understanding AI diagnostic tools
+- **Research**: Model training with medical datasets
+- **Workflow Integration**: Clinical decision support
+
+*⚠️ Note: This is a research/educational tool. Always consult medical professionals for actual diagnosis.*
+
+## 🛠️ Technology Stack
+
+- **Frontend**: Streamlit (Python web framework)
+- **AI/ML**: TensorFlow, Keras, scikit-learn
+- **Medical Imaging**: OpenCV, PIL, pydicom
+- **Database**: PostgreSQL with SQLAlchemy
+- **Visualization**: Matplotlib, Seaborn, Plotly
+
+## 📥 Installation & Setup
 
 ### Prerequisites
 - Python 3.8+
-- PostgreSQL database
-- 4GB+ RAM recommended for model training
+- PostgreSQL (optional, for data persistence)
+- 4GB+ RAM (recommended for model training)
 
-### Installation
+### Local Development
 ```bash
 # Clone the repository
-git clone https://github.com/aliharoon/lung-cancer-detection.git
+git clone https://github.com/Ali-Haroon3/lung-cancer-detection.git
 cd lung-cancer-detection
 
 # Install dependencies
-pip install -r requirements.txt
+pip install -r requirements_streamlit.txt
 
-# Set up database
-export DATABASE_URL="your_postgresql_connection_string"
+# Set up environment variables (optional)
+export DATABASE_URL="postgresql://user:password@localhost:5432/lung_cancer_db"
 
 # Run the application
 streamlit run app.py
 ```
 
-### Using Sample Data
-The application includes synthetic lung cancer imaging data for demonstration:
-```python
-# Generate sample dataset
-python sample_data_generator.py
+### 🌐 Deploy to Render (Recommended)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+
+1. Fork this repository
+2. Go to [render.com](https://render.com)
+3. Create new "Web Service" from your fork
+4. Use build command: `pip install -r requirements_streamlit.txt`
+5. Use start command: `streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true`
+
+## 📖 Usage Guide
+
+### 1. Data Upload
+- Upload medical images (PNG, JPG, DICOM)
+- Support for ZIP archives and batch processing
+- Automatic preprocessing and validation
+
+### 2. Model Training
+- Select from pre-trained architectures
+- Configure hyperparameters
+- Real-time training progress monitoring
+- Automatic model checkpointing
+
+### 3. Evaluation & Analysis
+- Medical performance metrics (sensitivity, specificity)
+- ROC curves and confusion matrices
+- Model comparison tools
+
+### 4. Prediction & Diagnosis
+- Single image and batch predictions
+- Confidence scoring with medical thresholds
+- Visual interpretability features
+- Results export for clinical use
+
+### 5. Database Management
+- Training session tracking
+- Performance analytics
+- Data visualization dashboard
+
+## 🏗️ Project Structure
+
+```
+lung-cancer-detection/
+├── app.py                 # Main application entry point
+├── pages/                 # Streamlit multi-page structure
+│   ├── 1_Data_Upload.py
+│   ├── 2_Model_Training.py
+│   ├── 3_Model_Evaluation.py
+│   ├── 4_Prediction.py
+│   └── 5_Database_Management.py
+├── models/                # CNN model implementations
+│   └── cnn_model.py
+├── database/              # Database service layer
+│   ├── database_manager.py
+│   ├── db_service.py
+│   └── models.py
+├── utils/                 # Utility modules
+│   ├── data_preprocessing.py
+│   ├── evaluation.py
+│   └── visualization.py
+├── sample_data/           # Sample medical imaging data
+└── .streamlit/           # Streamlit configuration
+    └── config.toml
 ```
 
-## 📁 Project Structure
-
-```
-├── app.py                    # Main Streamlit application
-├── pages/                    # Multi-page application structure
-│   ├── 1_Data_Upload.py     # Data upload and preprocessing
-│   ├── 2_Model_Training.py  # Model training interface
-│   ├── 3_Model_Evaluation.py# Model evaluation and metrics
-│   ├── 4_Prediction.py      # Prediction interface
-│   └── 5_Database_Management.py # Database dashboard
-├── models/                   # CNN model implementations
-│   └── cnn_model.py         # LungCancerCNN class
-├── database/                 # Database management
-│   ├── models.py            # SQLAlchemy models
-│   ├── database_manager.py  # Database operations
-│   └── db_service.py        # Database service layer
-├── utils/                    # Utility modules
-│   ├── data_preprocessing.py# Medical image processing
-│   ├── evaluation.py        # Performance metrics
-│   └── visualization.py     # Medical visualization tools
-├── sample_data/             # Sample medical images
-└── requirements.txt         # Python dependencies
-```
-
-## 🔬 Technical Architecture
-
-### Machine Learning Pipeline
-1. **Data Ingestion**: Medical image upload with DICOM support
-2. **Preprocessing**: Image standardization and quality validation
-3. **Model Training**: Transfer learning with medical-specific fine-tuning
-4. **Evaluation**: Comprehensive medical performance metrics
-5. **Deployment**: Real-time inference with confidence scoring
-
-### Database Schema
-- **Datasets**: Image collections with metadata and class distributions
-- **Models**: Model architecture and training configuration
-- **Training Sessions**: Complete training history and hyperparameters
-- **Evaluations**: Performance metrics and validation results
-- **Predictions**: Inference results with confidence scores and risk assessment
-- **Audit Logs**: User activity tracking and system monitoring
-
-## 📊 Model Performance
-
-### Supported Architectures
-- **ResNet50**: Deep residual networks optimized for medical imaging
-- **DenseNet121**: Dense connections for feature reuse and efficiency
-- **EfficientNetB0**: Compound scaling for optimal accuracy/efficiency balance
-
-### Evaluation Metrics
-- Accuracy, Precision, Recall, F1-Score
-- Medical-specific: Sensitivity, Specificity, AUC-ROC, AUC-PR
-- Confusion matrices and ROC curve analysis
-- Per-class performance breakdown
-
-## 🛠️ Configuration
+## 🔧 Configuration
 
 ### Environment Variables
 ```bash
-DATABASE_URL=postgresql://user:password@host:port/database
-STREAMLIT_SERVER_PORT=5000
-STREAMLIT_SERVER_ADDRESS=0.0.0.0
+DATABASE_URL=postgresql://user:password@host:port/database  # Optional
+PYTHONPATH=.                                                # For imports
 ```
 
-### Model Configuration
-```python
-# Training parameters
-EPOCHS = 50
-BATCH_SIZE = 32
-LEARNING_RATE = 0.001
-DROPOUT_RATE = 0.5
-L2_REGULARIZATION = 0.001
-```
-
-## 🔒 Security & Compliance
-
-- Database credentials secured through environment variables
-- Medical data handling following privacy best practices
-- Audit logging for regulatory compliance
-- No patient data stored in version control
+### Streamlit Configuration
+The app includes optimized configuration for production deployment in `.streamlit/config.toml`.
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/enhancement`)
-3. Commit changes (`git commit -am 'Add new feature'`)
-4. Push to branch (`git push origin feature/enhancement`)
-5. Create Pull Request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📝 License
+## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## ⚠️ Medical Disclaimer
 
-For issues, questions, or contributions:
-- Create an issue in the GitHub repository
-- Review the documentation in `/docs`
-- Check the troubleshooting guide
+This application is for research and educational purposes only. It should not be used as a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of qualified healthcare providers with questions regarding medical conditions.
 
-## 🙏 Acknowledgments
+## 📧 Contact & Support
 
-- TensorFlow/Keras team for the deep learning framework
-- Streamlit team for the web application framework
-- Medical imaging community for preprocessing best practices
-- Open source contributors and medical AI researchers
+- **Issues**: [GitHub Issues](https://github.com/Ali-Haroon3/lung-cancer-detection/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/Ali-Haroon3/lung-cancer-detection/discussions)
 
 ---
 
-**Note**: This application is for research and educational purposes. Medical decisions should always involve qualified healthcare professionals.
+**Built with ❤️ for advancing medical AI research**
