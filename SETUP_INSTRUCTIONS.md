@@ -1,6 +1,8 @@
-# 🚀 Quick Setup for GitHub - Ali-Haroon3
+# 🚀 Your Project is Ready for GitHub!
 
-Your lung cancer detection AI project is now cleaned up and ready for GitHub!
+✅ **Repository Already Connected**: Ali-Haroon3/Lung-Cancer-Detection  
+✅ **Project Cleaned Up**: All unnecessary files removed  
+✅ **Ready to Push**: Just run the push script or commands below
 
 ## What's Been Cleaned Up
 
