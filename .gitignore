@@ -1,4 +1,9 @@
-
+# Replit specific files
+replit.md
+.replit
+.upm/
+uv.lock
+pyproject.toml
 
 # Python
 __pycache__/
@@ -32,29 +37,7 @@ ENV/
 env.bak/
 venv.bak/
 
-# Streamlit
-.streamlit/secrets.toml
-*.log
-
-# Model files (optional - comment out if you want to version control models)
-*.h5
-*.pkl
-*.joblib
-best_model.h5
-
-# Data files
-sample_data/
-*.csv
-*.json
-data/
-datasets/
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# IDE
+# IDEs
 .vscode/
 .idea/
 *.swp
@@ -70,32 +53,30 @@ datasets/
 ehthumbs.db
 Thumbs.db
 
-# Jupyter Notebook
-.ipynb_checkpoints
+# Model files (too large for git)
+*.h5
+*.pkl
+*.joblib
+best_model.*
 
-# TensorFlow/Keras
+# Data files
+*.csv
+*.json
+*.zip
+sample_data/
+
+# Logs
+*.log
 logs/
-checkpoints/
-*.ckpt
-*.ckpt.*
 
-# Medical imaging files
-*.dcm
-*.dicom
-*.nii
-*.nii.gz
+# Database
+*.db
+*.sqlite3
 
-# Temporary files
-*.tmp
-*.temp
-temp/
-tmp/
-
-# Replit configuration
-replit.md
-REPLIT_GIT_SETUP.md
 # Environment variables
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.production
+
+# Temporary files
+tmp/
+temp/
