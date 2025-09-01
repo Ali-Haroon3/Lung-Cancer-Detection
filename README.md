@@ -1,4 +1,4 @@
-# 🫁 Lung Cancer Detection AI
+# Lung Cancer Detection AI
 
 An advanced deep learning application for lung cancer detection using Convolutional Neural Networks (CNN) with medical imaging analysis.
 
@@ -7,7 +7,7 @@ An advanced deep learning application for lung cancer detection using Convolutio
 ![TensorFlow](https://img.shields.io/badge/tensorflow-v2.17+-orange.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-## 🚀 Live Demo
+## Live Demo
 
 **[Deploy Your Own](RENDER_DEPLOYMENT.md)** - Follow the guide to get your app live in 10 minutes!
 
