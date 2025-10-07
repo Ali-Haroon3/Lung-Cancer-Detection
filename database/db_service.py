@@ -5,17 +5,33 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
+from urllib.parse import urlparse
 import streamlit as st
 
 class DatabaseService:
     def __init__(self):
-        self.connection_params = {
-            'host': os.getenv('PGHOST'),
-            'port': os.getenv('PGPORT'),
-            'database': os.getenv('PGDATABASE'),
-            'user': os.getenv('PGUSER'),
-            'password': os.getenv('PGPASSWORD')
-        }
+        # Try DATABASE_URL first (for Render deployment)
+        database_url = os.getenv('DATABASE_URL')
+        
+        if database_url:
+            # Parse DATABASE_URL for Render deployment
+            result = urlparse(database_url)
+            self.connection_params = {
+                'host': result.hostname,
+                'port': result.port,
+                'database': result.path[1:],  # Remove leading slash
+                'user': result.username,
+                'password': result.password
+            }
+        else:
+            # Fall back to individual env vars (for Replit)
+            self.connection_params = {
+                'host': os.getenv('PGHOST'),
+                'port': os.getenv('PGPORT'),
+                'database': os.getenv('PGDATABASE'),
+                'user': os.getenv('PGUSER'),
+                'password': os.getenv('PGPASSWORD')
+            }
     
     def get_connection(self):
         """Get database connection"""

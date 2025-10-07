@@ -52,6 +52,8 @@ if 'current_model_id' not in st.session_state:
     st.session_state.current_model_id = None
 if 'uploaded_data' not in st.session_state:
     st.session_state.uploaded_data = None
+if 'model_performance' not in st.session_state:
+    st.session_state.model_performance = None
 
 # Load existing trained model from database if available
 if db_service and not st.session_state.model_trained:
