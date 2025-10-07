@@ -6,10 +6,21 @@ from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 import uuid
 
-# Database setup
+# Database setup - support both DATABASE_URL (Render) and individual env vars (Replit)
 DATABASE_URL = os.getenv('DATABASE_URL')
 if not DATABASE_URL:
-    raise ValueError("DATABASE_URL environment variable is required")
+    # Construct DATABASE_URL from individual env vars (for Replit)
+    pghost = os.getenv('PGHOST')
+    pgport = os.getenv('PGPORT')
+    pgdatabase = os.getenv('PGDATABASE')
+    pguser = os.getenv('PGUSER')
+    pgpassword = os.getenv('PGPASSWORD')
+    
+    if all([pghost, pgport, pgdatabase, pguser, pgpassword]):
+        DATABASE_URL = f"postgresql://{pguser}:{pgpassword}@{pghost}:{pgport}/{pgdatabase}"
+    else:
+        raise ValueError("Database connection parameters not found. Set DATABASE_URL or individual PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD environment variables.")
+
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
