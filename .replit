@@ -27,7 +27,3 @@ packages = ["cairo", "ffmpeg-full", "freetype", "ghostscript", "glibcLocales", "
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 41863
-externalPort = 3000
