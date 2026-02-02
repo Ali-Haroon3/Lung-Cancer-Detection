@@ -7,12 +7,12 @@ import cv2
 # Configure page - clean, modern design
 st.set_page_config(
     page_title="Lung Cancer Detection AI",
-    page_icon="🫁",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for modern UI
+# Custom CSS with Chocolate Truffle color scheme
 st.markdown("""
 <style>
     /* Main container styling */
@@ -22,7 +22,7 @@ st.markdown("""
     
     /* Hero section */
     .hero-container {
-        background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #3d7ab5 100%);
+        background: linear-gradient(135deg, #38240D 0%, #713600 50%, #C05800 100%);
         padding: 3rem 2rem;
         border-radius: 20px;
         margin-bottom: 2rem;
@@ -30,7 +30,7 @@ st.markdown("""
     }
     
     .hero-title {
-        color: white;
+        color: #FDFBD4;
         font-size: 2.8rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
@@ -38,7 +38,7 @@ st.markdown("""
     }
     
     .hero-subtitle {
-        color: rgba(255,255,255,0.9);
+        color: rgba(253,251,212,0.9);
         font-size: 1.2rem;
         text-align: center;
         margin-bottom: 1.5rem;
@@ -46,40 +46,41 @@ st.markdown("""
     
     /* Feature cards */
     .feature-card {
-        background: white;
+        background: #FDFBD4;
         padding: 1.5rem;
         border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        border: 1px solid #e8ecf1;
+        box-shadow: 0 4px 20px rgba(56,36,13,0.12);
+        border: 1px solid #C05800;
         height: 100%;
         transition: transform 0.2s, box-shadow 0.2s;
     }
     
     .feature-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        box-shadow: 0 8px 30px rgba(56,36,13,0.18);
     }
     
     .feature-icon {
-        font-size: 2.5rem;
+        font-size: 2rem;
         margin-bottom: 1rem;
+        color: #713600;
     }
     
     .feature-title {
         font-size: 1.3rem;
         font-weight: 600;
-        color: #1e3a5f;
+        color: #38240D;
         margin-bottom: 0.5rem;
     }
     
     .feature-desc {
-        color: #6b7280;
+        color: #713600;
         font-size: 0.95rem;
     }
     
     /* Stats section */
     .stats-container {
-        background: #f8fafc;
+        background: #FDFBD4;
         padding: 1.5rem;
         border-radius: 15px;
         margin: 2rem 0;
@@ -88,18 +89,18 @@ st.markdown("""
     .stat-value {
         font-size: 2rem;
         font-weight: 700;
-        color: #1e3a5f;
+        color: #38240D;
     }
     
     .stat-label {
-        color: #6b7280;
+        color: #713600;
         font-size: 0.9rem;
     }
     
     /* Button styling */
     .stButton > button {
-        background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
-        color: white;
+        background: linear-gradient(135deg, #713600 0%, #C05800 100%);
+        color: #FDFBD4;
         border: none;
         padding: 0.75rem 2rem;
         border-radius: 10px;
@@ -109,7 +110,7 @@ st.markdown("""
     
     .stButton > button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(30,58,95,0.3);
+        box-shadow: 0 4px 15px rgba(113,54,0,0.4);
     }
     
     /* Hide Streamlit branding */
@@ -119,8 +120,8 @@ st.markdown("""
     
     /* Upload area styling */
     .upload-section {
-        background: #f8fafc;
-        border: 2px dashed #cbd5e1;
+        background: #FDFBD4;
+        border: 2px dashed #C05800;
         border-radius: 15px;
         padding: 2rem;
         text-align: center;
@@ -129,11 +130,55 @@ st.markdown("""
     
     /* Disclaimer */
     .disclaimer {
-        background: #fef3c7;
-        border-left: 4px solid #f59e0b;
+        background: #FDFBD4;
+        border-left: 4px solid #C05800;
         padding: 1rem;
         border-radius: 0 10px 10px 0;
         margin-top: 2rem;
+        color: #38240D;
+    }
+    
+    /* Tab styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background-color: #FDFBD4;
+        color: #38240D;
+        border-radius: 8px;
+        padding: 10px 20px;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background-color: #713600 !important;
+        color: #FDFBD4 !important;
+    }
+    
+    /* Success message */
+    .success-box {
+        background: linear-gradient(135deg, #713600 0%, #C05800 100%);
+        color: #FDFBD4;
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 1rem;
+    }
+    
+    .success-box h3 {
+        margin: 0;
+        color: #FDFBD4;
+    }
+    
+    .success-box p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+    }
+    
+    /* Info boxes */
+    .stAlert {
+        background-color: #FDFBD4;
+        color: #38240D;
+        border: 1px solid #C05800;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -145,13 +190,13 @@ if 'analyzed_images' not in st.session_state:
 # Hero Section
 st.markdown("""
 <div class="hero-container">
-    <h1 class="hero-title">🫁 Lung Cancer Detection AI</h1>
+    <h1 class="hero-title">Lung Cancer Detection AI</h1>
     <p class="hero-subtitle">Advanced deep learning analysis for medical imaging</p>
 </div>
 """, unsafe_allow_html=True)
 
 # Main tabs for navigation
-tab1, tab2, tab3 = st.tabs(["🔬 Analyze Image", "📊 About the Technology", "📁 Sample Images"])
+tab1, tab2, tab3 = st.tabs(["Analyze Image", "About the Technology", "Sample Images"])
 
 with tab1:
     st.markdown("### Upload a Medical Image for Analysis")
@@ -171,7 +216,7 @@ with tab1:
             image = Image.open(uploaded_file)
             st.image(image, caption="Uploaded Image", use_container_width=True)
             
-            if st.button("🔍 Analyze Image", use_container_width=True):
+            if st.button("Analyze Image", use_container_width=True):
                 with st.spinner("Analyzing image..."):
                     # Process image
                     img_array = np.array(image.convert('RGB'))
@@ -183,7 +228,6 @@ with tab1:
                     std_intensity = np.std(gray)
                     
                     # Demo analysis based on image characteristics
-                    # This provides a meaningful demo without a trained model
                     import time
                     time.sleep(1.5)  # Simulate processing
                     
@@ -203,10 +247,9 @@ with tab1:
             
             # Display analysis metrics
             st.markdown("""
-            <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
-                        color: white; padding: 1.5rem; border-radius: 15px; margin-bottom: 1rem;">
-                <h3 style="margin: 0; color: white;">✓ Analysis Complete</h3>
-                <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Image successfully processed</p>
+            <div class="success-box">
+                <h3>Analysis Complete</h3>
+                <p>Image successfully processed</p>
             </div>
             """, unsafe_allow_html=True)
             
@@ -259,7 +302,6 @@ with tab2:
     with col1:
         st.markdown("""
         <div class="feature-card">
-            <div class="feature-icon">🧠</div>
             <div class="feature-title">Deep Learning</div>
             <div class="feature-desc">
                 Powered by state-of-the-art Convolutional Neural Networks 
@@ -271,7 +313,6 @@ with tab2:
     with col2:
         st.markdown("""
         <div class="feature-card">
-            <div class="feature-icon">🎯</div>
             <div class="feature-title">High Accuracy</div>
             <div class="feature-desc">
                 Transfer learning with ResNet50, DenseNet121, and 
@@ -283,7 +324,6 @@ with tab2:
     with col3:
         st.markdown("""
         <div class="feature-card">
-            <div class="feature-icon">⚡</div>
             <div class="feature-title">Fast Analysis</div>
             <div class="feature-desc">
                 Get results in seconds with our optimized 
@@ -350,7 +390,7 @@ with tab3:
 # Disclaimer
 st.markdown("""
 <div class="disclaimer">
-    <strong>⚠️ Medical Disclaimer:</strong> This application is for research and educational 
+    <strong>Medical Disclaimer:</strong> This application is for research and educational 
     purposes only. It should not be used as a substitute for professional medical diagnosis. 
     Always consult with qualified healthcare providers for medical advice.
 </div>
@@ -359,7 +399,7 @@ st.markdown("""
 # Footer
 st.markdown("---")
 st.markdown("""
-<div style="text-align: center; color: #6b7280; padding: 1rem;">
+<div style="text-align: center; color: #713600; padding: 1rem;">
     <p>Lung Cancer Detection AI | Powered by TensorFlow & Streamlit</p>
 </div>
 """, unsafe_allow_html=True)
