@@ -164,7 +164,7 @@ class DatabaseService:
         try:
             query = """
             INSERT INTO model_evaluations (
-                model_id, evaluation_dataset, accuracy, precision_score, recall_score, f1_score,
+                model_id, evaluation_dataset, accuracy, precision, recall, f1_score,
                 sensitivity, specificity, auc_roc, auc_pr, confusion_matrix, 
                 classification_report, total_samples
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)

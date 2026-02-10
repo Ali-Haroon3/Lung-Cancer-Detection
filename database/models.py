@@ -15,15 +15,23 @@ if not DATABASE_URL:
     pgdatabase = os.getenv('PGDATABASE')
     pguser = os.getenv('PGUSER')
     pgpassword = os.getenv('PGPASSWORD')
-    
+
     if all([pghost, pgport, pgdatabase, pguser, pgpassword]):
         DATABASE_URL = f"postgresql://{pguser}:{pgpassword}@{pghost}:{pgport}/{pgdatabase}"
-    else:
-        raise ValueError("Database connection parameters not found. Set DATABASE_URL or individual PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD environment variables.")
 
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Initialize database engine only if DATABASE_URL is available
+engine = None
+SessionLocal = None
 Base = declarative_base()
+
+if DATABASE_URL:
+    try:
+        engine = create_engine(DATABASE_URL)
+        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    except Exception as e:
+        print(f"Warning: Database engine creation failed: {e}")
+        engine = None
+        SessionLocal = None
 
 class Dataset(Base):
     __tablename__ = "datasets"
@@ -210,7 +218,8 @@ class AuditLog(Base):
 
 # Create all tables
 def create_tables():
-    Base.metadata.create_all(bind=engine)
+    if engine is not None:
+        Base.metadata.create_all(bind=engine)
 
 # Database session management
 def get_db():
@@ -221,4 +230,6 @@ def get_db():
         db.close()
 
 def get_db_session():
+    if SessionLocal is None:
+        raise RuntimeError("Database is not configured. Set DATABASE_URL environment variable.")
     return SessionLocal()
