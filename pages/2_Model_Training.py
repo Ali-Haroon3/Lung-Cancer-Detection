@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import time
 import os
 import json
+import ast
 
 st.set_page_config(
     page_title="Model Training - Lung Cancer Detection",
@@ -61,7 +62,7 @@ if db_service and not st.session_state.model_trained:
                     from models.cnn_model import LungCancerCNN
                     
                     # Restore model configuration
-                    input_shape = eval(latest_model['input_shape']) if latest_model['input_shape'] else (224, 224, 3)
+                    input_shape = ast.literal_eval(latest_model['input_shape']) if latest_model['input_shape'] else (224, 224, 3)
                     num_classes = latest_model['num_classes']
                     architecture = latest_model['architecture']
                     
