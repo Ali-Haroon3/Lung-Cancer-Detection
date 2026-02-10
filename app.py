@@ -214,7 +214,7 @@ with tab1:
         if uploaded_file is not None:
             # Display uploaded image
             image = Image.open(uploaded_file)
-            st.image(image, caption="Uploaded Image", use_container_width=True)
+            st.image(image, caption="Uploaded Image")
             
             if st.button("Analyze Image", use_container_width=True):
                 with st.spinner("Analyzing image..."):
@@ -364,7 +364,7 @@ with tab3:
                     with cols[i % 2]:
                         img_path = os.path.join(normal_dir, f)
                         img = Image.open(img_path)
-                        st.image(img, caption=f"Normal - {f}", use_container_width=True)
+                        st.image(img, caption=f"Normal - {f}")
             else:
                 st.info("No normal sample images available")
         else:
@@ -381,7 +381,7 @@ with tab3:
                     with cols[i % 2]:
                         img_path = os.path.join(cancer_dir, f)
                         img = Image.open(img_path)
-                        st.image(img, caption=f"Cancer - {f}", use_container_width=True)
+                        st.image(img, caption=f"Cancer - {f}")
             else:
                 st.info("No cancer sample images available")
         else:
