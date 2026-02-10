@@ -32,6 +32,17 @@ class DatabaseService:
                 'user': os.getenv('PGUSER'),
                 'password': os.getenv('PGPASSWORD')
             }
+
+        # Validate that we have required connection parameters
+        if not database_url and not all([
+            self.connection_params.get('host'),
+            self.connection_params.get('database'),
+            self.connection_params.get('user')
+        ]):
+            raise RuntimeError(
+                "Database not configured. Please set DATABASE_URL environment variable "
+                "or individual PostgreSQL connection variables (PGHOST, PGDATABASE, PGUSER, PGPASSWORD)."
+            )
     
     def get_connection(self):
         """Get database connection"""
