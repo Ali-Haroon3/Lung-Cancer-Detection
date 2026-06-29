@@ -1,11 +1,32 @@
 import tensorflow as tf
 from tensorflow.keras.applications import ResNet50, DenseNet121, EfficientNetB0
-from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Dropout, BatchNormalization
+from tensorflow.keras.applications.resnet50 import preprocess_input as resnet_preprocess
+from tensorflow.keras.applications.densenet import preprocess_input as densenet_preprocess
+from tensorflow.keras.applications.efficientnet import preprocess_input as efficientnet_preprocess
+from tensorflow.keras.layers import (
+    Dense, GlobalAveragePooling2D, Dropout, BatchNormalization, Input, Rescaling
+)
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
 from tensorflow.keras.regularizers import l2
+from tensorflow.keras.metrics import AUC
 import numpy as np
+
+# Each ImageNet backbone expects its own input preprocessing. The app feeds
+# images normalised to [0, 1]; we rescale back to [0, 255] inside the graph and
+# then apply the architecture-specific preprocess_input so the pretrained
+# weights actually see the distribution they were trained on.
+_PREPROCESSORS = {
+    'resnet50': resnet_preprocess,
+    'densenet121': densenet_preprocess,
+    'efficientnetb0': efficientnet_preprocess,
+}
+_BACKBONES = {
+    'resnet50': ResNet50,
+    'densenet121': DenseNet121,
+    'efficientnetb0': EfficientNetB0,
+}
 
 class LungCancerCNN:
     def __init__(self, input_shape=(224, 224, 3), num_classes=2, architecture='resnet50'):
@@ -21,41 +42,41 @@ class LungCancerCNN:
         self.num_classes = num_classes
         self.architecture = architecture
         self.model = None
+        self.base_model = None
         self.history = None
-        
+        self.loss = None
+
     def build_model(self, dropout_rate=0.5, l2_reg=0.001):
         """
         Build the CNN model with transfer learning
-        
+
+        The backbone is built on top of an explicit Input -> Rescaling ->
+        preprocess_input chain (via ``input_tensor``) so the convolutional
+        layers stay top-level layers of the final model. That keeps Grad-CAM
+        working (it can find the last conv layer) and lets fine-tuning unfreeze
+        the real backbone.
+
         Args:
             dropout_rate: Dropout rate for regularization
             l2_reg: L2 regularization strength
         """
-        # Select base model
-        if self.architecture == 'resnet50':
-            base_model = ResNet50(
-                weights='imagenet',
-                include_top=False,
-                input_shape=self.input_shape
-            )
-        elif self.architecture == 'densenet121':
-            base_model = DenseNet121(
-                weights='imagenet',
-                include_top=False,
-                input_shape=self.input_shape
-            )
-        elif self.architecture == 'efficientnetb0':
-            base_model = EfficientNetB0(
-                weights='imagenet',
-                include_top=False,
-                input_shape=self.input_shape
-            )
-        else:
+        if self.architecture not in _BACKBONES:
             raise ValueError(f"Unsupported architecture: {self.architecture}")
-        
+
+        inputs = Input(shape=self.input_shape)
+        x = Rescaling(255.0)(inputs)            # [0,1] -> [0,255]
+        x = _PREPROCESSORS[self.architecture](x)  # architecture-specific normalisation
+
+        base_model = _BACKBONES[self.architecture](
+            weights='imagenet',
+            include_top=False,
+            input_tensor=x,
+        )
+
         # Freeze base model layers initially
         base_model.trainable = False
-        
+        self.base_model = base_model
+
         # Add custom classification head
         x = base_model.output
         x = GlobalAveragePooling2D()(x)
@@ -64,16 +85,16 @@ class LungCancerCNN:
         x = Dropout(dropout_rate)(x)
         x = Dense(256, activation='relu', kernel_regularizer=l2(l2_reg))(x)
         x = Dropout(dropout_rate)(x)
-        
+
         # Output layer
         if self.num_classes == 2:
             predictions = Dense(1, activation='sigmoid', name='predictions')(x)
         else:
             predictions = Dense(self.num_classes, activation='softmax', name='predictions')(x)
-        
+
         # Create model
-        self.model = Model(inputs=base_model.input, outputs=predictions)
-        
+        self.model = Model(inputs=inputs, outputs=predictions)
+
         return self.model
     
     def compile_model(self, learning_rate=0.001, loss=None, metrics=None):
@@ -94,11 +115,14 @@ class LungCancerCNN:
                 loss = 'binary_crossentropy'
             else:
                 loss = 'categorical_crossentropy'
-        
+
         # Auto-select metrics
         if metrics is None:
-            metrics = ['accuracy']
-        
+            metrics = self._default_metrics()
+
+        # Remember loss so fine-tuning can recompile with the same objective
+        self.loss = loss
+
         # Compile model
         optimizer = Adam(learning_rate=learning_rate)
         self.model.compile(
@@ -106,8 +130,15 @@ class LungCancerCNN:
             loss=loss,
             metrics=metrics
         )
-        
+
         return self.model
+
+    def _default_metrics(self):
+        """Build a fresh list of metrics (fresh objects each call so they can be
+        safely reused across a fine-tuning recompile)."""
+        if self.num_classes == 2:
+            return ['accuracy', AUC(name='auc')]
+        return ['accuracy']
     
     def get_callbacks(self, patience=10, monitor='val_loss', save_path='best_model.h5'):
         """
@@ -175,15 +206,15 @@ class LungCancerCNN:
         # Fine-tuning (if specified)
         if fine_tune_epochs > 0:
             print("\nStarting fine-tuning with unfrozen base model...")
-            
-            # Unfreeze base model
-            self.model.layers[0].trainable = True
-            
-            # Recompile with lower learning rate
+
+            # Unfreeze the actual pretrained backbone (not just the input layer)
+            self.base_model.trainable = True
+
+            # Recompile with a low learning rate, same loss, fresh metric objects
             self.model.compile(
                 optimizer=Adam(learning_rate=fine_tune_lr),
-                loss=self.model.loss,
-                metrics=self.model.compiled_metrics._metrics
+                loss=self.loss,
+                metrics=self._default_metrics()
             )
             
             # Continue training
@@ -197,11 +228,15 @@ class LungCancerCNN:
                 verbose=1
             )
             
-            # Combine histories
+            # Combine histories over the union of keys so a key present in one
+            # phase but not the other can't KeyError or be silently dropped.
             combined_history = {}
-            for key in history1.history.keys():
-                combined_history[key] = history1.history[key] + history2.history[key]
-            
+            all_keys = set(history1.history.keys()) | set(history2.history.keys())
+            for key in all_keys:
+                combined_history[key] = (
+                    history1.history.get(key, []) + history2.history.get(key, [])
+                )
+
             self.history = combined_history
         else:
             self.history = history1.history

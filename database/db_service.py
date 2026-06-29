@@ -43,10 +43,151 @@ class DatabaseService:
                 "Database not configured. Please set DATABASE_URL environment variable "
                 "or individual PostgreSQL connection variables (PGHOST, PGDATABASE, PGUSER, PGPASSWORD)."
             )
-    
+
+        # Make sure the schema exists. The pages use raw SQL (this service) which
+        # assumes the tables are already present; nothing else creates them on a
+        # fresh deployment, so do it here. UUID primary keys get a server-side
+        # default because the raw INSERTs never supply an id.
+        self._ensure_schema()
+
     def get_connection(self):
         """Get database connection"""
         return psycopg2.connect(**self.connection_params)
+
+    # SQL is split per statement so a failure on one CREATE doesn't abort the rest.
+    _SCHEMA_STATEMENTS = [
+        """
+        CREATE TABLE IF NOT EXISTS datasets (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            name VARCHAR(255) NOT NULL,
+            description TEXT,
+            total_images INTEGER,
+            class_names TEXT[],
+            class_distribution TEXT,
+            created_at TIMESTAMP DEFAULT now(),
+            updated_at TIMESTAMP DEFAULT now()
+        )
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS images (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            dataset_id UUID,
+            filename VARCHAR(255),
+            file_path VARCHAR(500),
+            file_type VARCHAR(50),
+            class_label VARCHAR(100),
+            class_index INTEGER,
+            width INTEGER,
+            height INTEGER,
+            channels INTEGER,
+            file_size INTEGER,
+            preprocessing_applied BOOLEAN DEFAULT FALSE,
+            split_type VARCHAR(20),
+            created_at TIMESTAMP DEFAULT now()
+        )
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS models (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            name VARCHAR(255) NOT NULL,
+            architecture VARCHAR(100),
+            input_shape VARCHAR(50),
+            num_classes INTEGER,
+            total_parameters INTEGER,
+            model_file_path VARCHAR(500),
+            model_weights_path VARCHAR(500),
+            is_trained BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT now(),
+            updated_at TIMESTAMP DEFAULT now()
+        )
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS training_sessions (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            model_id UUID,
+            dataset_id UUID,
+            epochs INTEGER,
+            batch_size INTEGER,
+            learning_rate DOUBLE PRECISION,
+            dropout_rate DOUBLE PRECISION,
+            l2_regularization DOUBLE PRECISION,
+            use_data_augmentation BOOLEAN,
+            use_class_weights BOOLEAN,
+            class_weights TEXT,
+            fine_tuning_enabled BOOLEAN,
+            fine_tune_epochs INTEGER,
+            fine_tune_learning_rate DOUBLE PRECISION,
+            final_train_loss DOUBLE PRECISION,
+            final_train_accuracy DOUBLE PRECISION,
+            final_val_loss DOUBLE PRECISION,
+            final_val_accuracy DOUBLE PRECISION,
+            best_val_loss DOUBLE PRECISION,
+            best_val_accuracy DOUBLE PRECISION,
+            epochs_completed INTEGER,
+            training_time_seconds DOUBLE PRECISION,
+            training_history TEXT,
+            status VARCHAR(50),
+            error_message TEXT,
+            started_at TIMESTAMP,
+            completed_at TIMESTAMP,
+            created_at TIMESTAMP DEFAULT now()
+        )
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS model_evaluations (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            model_id UUID,
+            evaluation_dataset VARCHAR(50),
+            accuracy DOUBLE PRECISION,
+            precision DOUBLE PRECISION,
+            recall DOUBLE PRECISION,
+            f1_score DOUBLE PRECISION,
+            sensitivity DOUBLE PRECISION,
+            specificity DOUBLE PRECISION,
+            auc_roc DOUBLE PRECISION,
+            auc_pr DOUBLE PRECISION,
+            confusion_matrix TEXT,
+            classification_report TEXT,
+            per_class_metrics TEXT,
+            total_samples INTEGER,
+            evaluation_time_seconds DOUBLE PRECISION,
+            created_at TIMESTAMP DEFAULT now()
+        )
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS predictions (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            model_id UUID,
+            image_id UUID,
+            external_filename VARCHAR(255),
+            external_file_type VARCHAR(50),
+            predicted_class VARCHAR(100),
+            predicted_class_index INTEGER,
+            confidence_score DOUBLE PRECISION,
+            prediction_probabilities TEXT,
+            prediction_time_seconds DOUBLE PRECISION,
+            confidence_threshold DOUBLE PRECISION,
+            preprocessing_applied BOOLEAN DEFAULT TRUE,
+            batch_prediction BOOLEAN DEFAULT FALSE,
+            batch_id UUID,
+            risk_level VARCHAR(20),
+            clinical_notes TEXT,
+            created_at TIMESTAMP DEFAULT now()
+        )
+        """,
+    ]
+
+    def _ensure_schema(self):
+        """Create tables if they don't exist. Failures are logged, not raised,
+        so a schema hiccup never blocks the rest of the app from loading."""
+        try:
+            with self.get_connection() as conn:
+                with conn.cursor() as cur:
+                    for statement in self._SCHEMA_STATEMENTS:
+                        cur.execute(statement)
+                conn.commit()
+        except Exception as e:
+            print(f"Schema initialization warning: {e}")
     
     def execute_query(self, query: str, params: tuple = None, fetch: bool = True):
         """Execute a query and return results"""

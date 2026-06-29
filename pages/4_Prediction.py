@@ -185,6 +185,13 @@ if prediction_mode == "Single Image":
             if st.button("🔍 Make Prediction", type="primary", use_container_width=True):
                 with st.spinner("Making prediction..."):
                     try:
+                        # Resolve filename for both sample paths (str) and uploads
+                        pred_filename = (
+                            os.path.basename(uploaded_file)
+                            if isinstance(uploaded_file, str)
+                            else uploaded_file.name
+                        )
+
                         # Prepare image for prediction
                         image_batch = np.expand_dims(processed_image, axis=0)
                         
@@ -205,7 +212,7 @@ if prediction_mode == "Single Image":
                         prediction_result = {
                             'image': processed_image,
                             'original_image': original_image,
-                            'filename': uploaded_file.name,
+                            'filename': pred_filename,
                             'predicted_class': pred_class,
                             'confidence': confidence,
                             'probabilities': pred_proba,
