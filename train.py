@@ -71,8 +71,11 @@ def main():
     ap.add_argument("--config", default=None, help="Dataset config name (if any)")
     ap.add_argument("--architecture", default="efficientnetb0",
                     choices=["resnet50", "densenet121", "efficientnetb0"])
-    ap.add_argument("--epochs", type=int, default=15)
-    ap.add_argument("--fine-tune-epochs", type=int, default=5)
+    # High caps on purpose: EarlyStopping (patience 10, restore_best_weights)
+    # and ReduceLROnPlateau stop training at the best checkpoint, so larger
+    # caps only help convergence on this small (~400-image) dataset.
+    ap.add_argument("--epochs", type=int, default=30)
+    ap.add_argument("--fine-tune-epochs", type=int, default=10)
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument("--limit", type=int, default=0,
                     help="Cap examples per split (0 = all) for a quick smoke run")
