@@ -368,19 +368,21 @@ with tab1:
                 st.write("**Class probabilities**")
                 st.table(prob_table)
 
-                # Real Grad-CAM overlay
-                st.markdown("#### Grad-CAM (regions driving the prediction)")
-                try:
-                    viz = MedicalVisualization(class_names)
-                    fig_cam, _ = viz.create_class_activation_map(model.model, proc, pred_class)
-                    # blend the matplotlib figure into the dark theme
-                    fig_cam.patch.set_facecolor("#0e141f")
-                    for ax in fig_cam.axes:
-                        ax.set_facecolor("#0e141f")
-                        ax.title.set_color("#e7eef6")
-                    st.pyplot(fig_cam, transparent=True)
-                except Exception as e:
-                    st.info(f"Grad-CAM unavailable: {e}")
+                # Grad-CAM is opt-in: the gradient pass is the heaviest per-image
+                # step, so don't run it on every analyze.
+                if st.checkbox("Show Grad-CAM explanation (regions driving the prediction)"):
+                    with st.spinner("Computing Grad-CAM..."):
+                        try:
+                            viz = MedicalVisualization(class_names)
+                            fig_cam, _ = viz.create_class_activation_map(model.model, proc, pred_class)
+                            # blend the matplotlib figure into the dark theme
+                            fig_cam.patch.set_facecolor("#0e141f")
+                            for ax in fig_cam.axes:
+                                ax.set_facecolor("#0e141f")
+                                ax.title.set_color("#e7eef6")
+                            st.pyplot(fig_cam, transparent=True)
+                        except Exception as e:
+                            st.info(f"Grad-CAM unavailable: {e}")
 
             # --- Real image diagnostics (always shown) ---
             st.markdown("#### Image Diagnostics")

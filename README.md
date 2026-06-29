@@ -1,6 +1,21 @@
+---
+title: Lung Cancer Detection AI
+emoji: 🫁
+colorFrom: blue
+colorTo: indigo
+sdk: streamlit
+app_file: app.py
+pinned: false
+license: mit
+---
+
 # Lung Cancer Detection AI
 
 An advanced deep learning application for lung cancer detection using Convolutional Neural Networks (CNN) with medical imaging analysis.
+
+> Deployed on **Hugging Face Spaces** (Streamlit SDK). The trained model is loaded
+> from `models/lung_cancer_model.keras` if present, otherwise downloaded once from
+> the URL in the `MODEL_URL` env var. See [DEPLOY_HF.md](DEPLOY_HF.md).
 
 ![Python](https://img.shields.io/badge/python-v3.8+-blue.svg)
 ![Streamlit](https://img.shields.io/badge/streamlit-v1.46+-red.svg)
@@ -63,7 +78,7 @@ git clone https://github.com/Ali-Haroon3/lung-cancer-detection.git
 cd lung-cancer-detection
 
 # Install dependencies
-pip install -r requirements_streamlit.txt
+pip install -r requirements.txt
 
 # Set up environment variables (optional)
 export DATABASE_URL="postgresql://user:password@localhost:5432/lung_cancer_db"
@@ -79,7 +94,7 @@ streamlit run app.py
 1. Fork this repository
 2. Go to [render.com](https://render.com)
 3. Create new "Web Service" from your fork
-4. Use build command: `pip install -r requirements_streamlit.txt`
+4. Use build command: `pip install -r requirements.txt`
 5. Use start command: `streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true`
 
 ## 📖 Usage Guide

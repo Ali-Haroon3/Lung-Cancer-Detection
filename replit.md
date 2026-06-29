@@ -103,7 +103,7 @@ Preferred communication style: Simple, everyday language.
 ### Environment Configuration
 - **Python 3.8+**: Runtime environment
 - **Environment Variables**: Database connection parameters (PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD)
-- **Dependencies**: Managed through requirements_streamlit.txt for cloud deployment
+- **Dependencies**: Managed through requirements.txt for cloud deployment
 
 ### Database Setup
 - **PostgreSQL Database**: Required for full functionality
