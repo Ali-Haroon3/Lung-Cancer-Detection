@@ -1,5 +1,5 @@
 # Dependencies for the OFFLINE trainer (train.py) only.
-# The deployed app uses requirements_streamlit.txt and does NOT need these.
+# The deployed app uses requirements.txt and does NOT need these.
 # TensorFlow 2.15 requires Python <= 3.11, so run train.py in such an env.
--r requirements_streamlit.txt
+-r requirements.txt
 datasets==2.16.1

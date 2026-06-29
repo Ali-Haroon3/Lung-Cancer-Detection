@@ -30,7 +30,7 @@ Use these exact settings:
 - **Runtime:** `Python 3`
 
 **Build & Deploy:**
-- **Build Command:** `pip install -r requirements_streamlit.txt`
+- **Build Command:** `pip install -r requirements.txt`
 - **Start Command:** `streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true`
 
 **Advanced Settings:**
@@ -69,9 +69,9 @@ For full functionality with data persistence:
 ## Troubleshooting
 
 **Build fails?**
-- Check that `requirements_streamlit.txt` exists in your repository
+- Check that `requirements.txt` exists in your repository
 - Ensure `.python-version` file exists with `3.11.9`
-- Ensure the build command is exactly: `pip install -r requirements_streamlit.txt`
+- Ensure the build command is exactly: `pip install -r requirements.txt`
 
 **App won't start?**
 - Verify start command: `streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true`
