@@ -1,0 +1,13 @@
+{
+  "class_names": [
+    "normal",
+    "cancer"
+  ],
+  "architecture": "efficientnetb0",
+  "input_shape": [
+    224,
+    224,
+    3
+  ],
+  "source_dataset": "dorsar/lung-cancer"
+}

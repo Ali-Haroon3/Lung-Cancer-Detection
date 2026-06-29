@@ -17,76 +17,96 @@ st.set_page_config(
 )
 
 # ---------------------------------------------------------------------------
-# Flat theme — solid colours, no gradients. (Palette: chocolate truffle.)
+# Dark "instrument" theme — near-black, one cyan signal, flat panels.
 # ---------------------------------------------------------------------------
 st.markdown("""
 <style>
-    .main > div { padding-top: 1rem; }
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 
-    /* Feature cards — flat, bordered, no gradient */
-    .feature-card {
-        background: #ffffff;
-        padding: 1.5rem;
-        border-radius: 12px;
-        border: 1px solid #e7d9b0;
-        box-shadow: 0 1px 3px rgba(56,36,13,0.08);
-        height: 100%;
-    }
-    .feature-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #38240D;
-        margin-bottom: 0.5rem;
-    }
-    .feature-desc { color: #713600; font-size: 0.95rem; }
-
-    /* Status banners — solid colours */
-    .status-ok {
-        background: #1b5e20; color: #FDFBD4;
-        padding: 0.85rem 1.1rem; border-radius: 10px; margin: 0.5rem 0 1rem 0;
-        font-weight: 600;
-    }
-    .status-warn {
-        background: #8a4b00; color: #FDFBD4;
-        padding: 0.85rem 1.1rem; border-radius: 10px; margin: 0.5rem 0 1rem 0;
-        font-weight: 500;
+    :root{
+        --bg:#070b12; --panel:#0e141f; --border:rgba(120,160,200,0.14);
+        --text:#e7eef6; --muted:#8aa0b6; --accent:#2ee6ff;
+        --ok:#36d399; --warn:#ff9d4d;
     }
 
-    /* Buttons — solid, colour shift on hover (no gradient) */
-    .stButton > button {
-        background: #713600;
-        color: #FDFBD4;
-        border: none;
-        padding: 0.6rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: background 0.2s;
+    /* Typography (avoid icon containers; no global * selector) */
+    html, body, .stApp, [data-testid="stAppViewContainer"], .stMarkdown,
+    p, li, label, input, textarea, select, button, .stCaption {
+        font-family:'IBM Plex Sans', -apple-system, "Segoe UI", sans-serif;
     }
-    .stButton > button:hover { background: #C05800; color: #FDFBD4; }
+    h1, h2, h3, h4, h5, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
+        font-family:'Sora', sans-serif; letter-spacing:-0.01em; color:var(--text);
+    }
 
-    /* Hide Streamlit chrome */
+    .main > div { padding-top: 0.4rem; }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    .disclaimer {
-        background: #ffffff;
-        border-left: 4px solid #C05800;
-        padding: 1rem;
-        border-radius: 0 10px 10px 0;
-        margin-top: 2rem;
-        color: #38240D;
+    /* Feature cards — flat dark, cyan edge on hover */
+    .feature-card {
+        background: var(--panel); border: 1px solid var(--border);
+        border-radius: 14px; padding: 1.4rem; height: 100%;
+        transition: border-color .2s, box-shadow .2s;
+    }
+    .feature-card:hover {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px var(--accent), 0 10px 34px rgba(46,230,255,0.08);
+    }
+    .feature-title { font-family:'Sora'; font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 0.45rem; }
+    .feature-desc { color: var(--muted); font-size: 0.92rem; line-height: 1.55; }
+
+    /* Status banners — flat, accent left edge */
+    .status-ok, .status-warn {
+        background: var(--panel); border: 1px solid var(--border); border-left-width: 3px;
+        padding: 0.8rem 1.1rem; border-radius: 10px; margin: 0.4rem 0 1.1rem 0; font-size: 0.95rem;
+    }
+    .status-ok { border-left-color: var(--ok); color: #cdebdc; }
+    .status-warn { border-left-color: var(--warn); color: #f2dcc2; }
+
+    /* Mono kicker label */
+    .kicker {
+        font-family:'IBM Plex Mono'; text-transform: uppercase; letter-spacing: 0.18em;
+        font-size: 0.72rem; color: var(--accent); margin: 0.2rem 0 0.1rem 0;
     }
 
-    .stTabs [data-baseweb="tab"] {
-        background-color: #ffffff;
-        color: #38240D;
-        border-radius: 8px;
-        padding: 10px 20px;
+    /* Metrics -> instrument tiles */
+    [data-testid="stMetric"] {
+        background: var(--panel); border: 1px solid var(--border);
+        border-radius: 12px; padding: 0.7rem 1rem;
     }
-    .stTabs [aria-selected="true"] {
-        background-color: #713600 !important;
-        color: #FDFBD4 !important;
+    [data-testid="stMetricLabel"] {
+        font-family:'IBM Plex Mono'; text-transform: uppercase;
+        letter-spacing: 0.07em; font-size: 0.7rem; color: var(--muted);
+    }
+    [data-testid="stMetricValue"] { font-family:'Sora'; color: var(--text); }
+
+    /* Buttons — ghost cyan, fill + glow on hover */
+    .stButton > button {
+        background: transparent; color: var(--accent);
+        border: 1px solid var(--accent); border-radius: 9px;
+        padding: 0.55rem 1.4rem; font-weight: 600; transition: all .18s;
+    }
+    .stButton > button:hover { background: var(--accent); color: #04141a; box-shadow: 0 0 22px rgba(46,230,255,0.35); }
+    .stButton > button[kind="primary"] { background: var(--accent); color: #04141a; }
+    .stButton > button[kind="primary"]:hover { box-shadow: 0 0 26px rgba(46,230,255,0.45); }
+
+    /* File uploader blends into the dark surface */
+    [data-testid="stFileUploader"] section {
+        background: var(--panel); border: 1px dashed var(--border); border-radius: 12px;
+    }
+
+    /* Tabs — quiet, cyan underline when active */
+    .stTabs [data-baseweb="tab-list"] { gap: 4px; border-bottom: 1px solid var(--border); }
+    .stTabs [data-baseweb="tab"] {
+        background: transparent; color: var(--muted); border-radius: 8px 8px 0 0;
+        padding: 10px 18px; font-family:'IBM Plex Mono'; font-size: 0.84rem; letter-spacing: 0.03em;
+    }
+    .stTabs [aria-selected="true"] { color: var(--accent) !important; border-bottom: 2px solid var(--accent); }
+
+    .disclaimer {
+        background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--warn);
+        padding: 1rem 1.1rem; border-radius: 10px; margin-top: 1.5rem; color: var(--muted); font-size: 0.9rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -99,31 +119,53 @@ HERO_HTML = """
 <div id="hero">
   <canvas id="scene"></canvas>
   <div id="overlay">
+    <div class="kick">AI-ASSISTED &middot; CHEST IMAGING</div>
     <h1>Lung Cancer Detection AI</h1>
-    <p>Deep-learning analysis for medical imaging</p>
+    <p>Deep-learning classification with explainable Grad-CAM</p>
   </div>
 </div>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;800&family=IBM+Plex+Mono:wght@500&display=swap');
   html, body { margin: 0; }
   #hero {
-    position: relative; width: 100%; height: 340px;
-    background: #1c1306; border-radius: 16px; overflow: hidden;
-    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    position: relative; width: 100%; height: 380px;
+    background: #070b12; border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(120,160,200,0.14);
+    font-family: 'Sora', -apple-system, sans-serif;
+  }
+  /* single soft light source behind the mesh (atmosphere, not UI gradient) */
+  #hero::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 46%, rgba(46,230,255,0.16), rgba(7,11,18,0) 55%);
+    pointer-events: none;
   }
   #scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   #overlay {
     position: absolute; inset: 0; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; text-align: center;
-    pointer-events: none;
+    align-items: center; justify-content: center; text-align: center; pointer-events: none;
+  }
+  .kick {
+    font-family: 'IBM Plex Mono', monospace; color: #2ee6ff;
+    letter-spacing: 0.34em; font-size: 0.74rem; font-weight: 500;
+    margin-bottom: 0.7rem; opacity: 0; transform: translateY(10px);
   }
   #overlay h1 {
-    color: #FDFBD4; font-size: 2.6rem; font-weight: 700; margin: 0;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+    color: #f3f8ff; font-size: 2.9rem; font-weight: 800; margin: 0; line-height: 1.04;
+    text-shadow: 0 2px 30px rgba(46,230,255,0.25); opacity: 0; transform: translateY(14px);
   }
   #overlay p {
-    color: rgba(253,251,212,0.88); font-size: 1.1rem; margin: 0.5rem 0 0 0;
-    text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+    color: rgba(199,217,235,0.9); font-size: 1.05rem; margin: 0.7rem 0 0 0;
+    opacity: 0; transform: translateY(14px);
   }
+  @media (prefers-reduced-motion: no-preference) {
+    .kick { animation: rise .7s ease .05s forwards; }
+    #overlay h1 { animation: rise .8s cubic-bezier(.2,.7,.2,1) .18s forwards; }
+    #overlay p { animation: rise .8s ease .34s forwards; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .kick, #overlay h1, #overlay p { opacity: 1; transform: none; }
+  }
+  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -142,33 +184,32 @@ HERO_HTML = """
     const group = new THREE.Group();
     scene.add(group);
 
-    // Wireframe icosahedron (accent orange)
+    // Wireframe icosahedron (cyan signal)
     const geo = new THREE.IcosahedronGeometry(1.3, 1);
     const wire = new THREE.LineSegments(
       new THREE.EdgesGeometry(geo),
-      new THREE.LineBasicMaterial({ color: 0xC05800 })
+      new THREE.LineBasicMaterial({ color: 0x2ee6ff, transparent: true, opacity: 0.85 })
     );
     group.add(wire);
 
-    // Point-cloud shell (cream) — evokes a volumetric scan
-    const pts = [];
-    for (let i = 0; i < 900; i++) {
-      const u = Math.random(), v = Math.random();
-      const theta = 2 * Math.PI * u, phi = Math.acos(2 * v - 1);
-      const r = 1.55;
-      pts.push(
-        r * Math.sin(phi) * Math.cos(theta),
-        r * Math.sin(phi) * Math.sin(theta),
-        r * Math.cos(phi)
-      );
+    // Two point-cloud shells -> volumetric "scan" with a faint halo
+    function shell(count, radius, color, size, opacity) {
+      const pts = [];
+      for (let i = 0; i < count; i++) {
+        const u = Math.random(), v = Math.random();
+        const theta = 2 * Math.PI * u, phi = Math.acos(2 * v - 1);
+        pts.push(radius * Math.sin(phi) * Math.cos(theta),
+                 radius * Math.sin(phi) * Math.sin(theta),
+                 radius * Math.cos(phi));
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
+      return new THREE.Points(g, new THREE.PointsMaterial({
+        color: color, size: size, transparent: true, opacity: opacity
+      }));
     }
-    const pgeo = new THREE.BufferGeometry();
-    pgeo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
-    const points = new THREE.Points(
-      pgeo,
-      new THREE.PointsMaterial({ color: 0xFDFBD4, size: 0.03 })
-    );
-    group.add(points);
+    group.add(shell(1100, 1.55, 0xbfefff, 0.028, 0.95));  // bright shell
+    group.add(shell(700, 1.95, 0x2ee6ff, 0.02, 0.35));    // faint outer halo
 
     function resize() {
       const w = hero.clientWidth, h = hero.clientHeight;
@@ -189,7 +230,7 @@ HERO_HTML = """
   })();
 </script>
 """
-components.html(HERO_HTML, height=360)
+components.html(HERO_HTML, height=400)
 
 
 # ---------------------------------------------------------------------------
@@ -216,17 +257,23 @@ def build_intensity_surface(gray):
     """Interactive 3D surface of pixel intensity for the uploaded scan."""
     small = cv2.resize(gray, (96, 96), interpolation=cv2.INTER_AREA).astype(float)
     z = np.flipud(small)  # match image orientation (row 0 at top)
-    fig = go.Figure(data=[go.Surface(z=z, colorscale="Cividis", showscale=False)])
+    # dark -> cyan colorscale to match the theme
+    cyan_scale = [[0.0, "#0a1620"], [0.5, "#0bb8d6"], [1.0, "#2ee6ff"]]
+    fig = go.Figure(data=[go.Surface(z=z, colorscale=cyan_scale, showscale=False)])
     fig.update_layout(
+        template="plotly_dark",
         height=460,
         margin=dict(l=0, r=0, t=10, b=0),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#8aa0b6"),
         scene=dict(
             xaxis=dict(visible=False),
             yaxis=dict(visible=False),
-            zaxis=dict(title="Intensity"),
+            zaxis=dict(title="Intensity", backgroundcolor="rgba(0,0,0,0)",
+                       gridcolor="rgba(120,160,200,0.15)"),
             aspectratio=dict(x=1, y=1, z=0.45),
         ),
-        paper_bgcolor="rgba(0,0,0,0)",
     )
     return fig
 
@@ -326,7 +373,12 @@ with tab1:
                 try:
                     viz = MedicalVisualization(class_names)
                     fig_cam, _ = viz.create_class_activation_map(model.model, proc, pred_class)
-                    st.pyplot(fig_cam)
+                    # blend the matplotlib figure into the dark theme
+                    fig_cam.patch.set_facecolor("#0e141f")
+                    for ax in fig_cam.axes:
+                        ax.set_facecolor("#0e141f")
+                        ax.title.set_color("#e7eef6")
+                    st.pyplot(fig_cam, transparent=True)
                 except Exception as e:
                     st.info(f"Grad-CAM unavailable: {e}")
 
@@ -473,7 +525,7 @@ st.markdown("""
 
 st.markdown("---")
 st.markdown("""
-<div style="text-align: center; color: #713600; padding: 1rem;">
-    <p>Lung Cancer Detection AI | Powered by TensorFlow & Streamlit</p>
+<div style="text-align: center; color: #8aa0b6; padding: 1rem; font-size: 0.85rem;">
+    <p>Lung Cancer Detection AI &nbsp;·&nbsp; Powered by TensorFlow &amp; Streamlit</p>
 </div>
 """, unsafe_allow_html=True)
