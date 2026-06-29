@@ -8,6 +8,7 @@ import os
 from utils.data_preprocessing import MedicalImagePreprocessor
 from utils.visualization import MedicalVisualization
 from utils.evaluation import MedicalModelEvaluator
+from utils.model_state import ensure_model_loaded
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
@@ -26,6 +27,9 @@ if 'trained_model' not in st.session_state:
     st.session_state.trained_model = None
 if 'class_names' not in st.session_state:
     st.session_state.class_names = ['normal', 'cancer']
+
+# Load a committed model artifact if nothing has been trained this session
+ensure_model_loaded()
 
 # Check if model is trained
 if not st.session_state.model_trained or st.session_state.trained_model is None:
