@@ -126,9 +126,9 @@ HERO_HTML = """
 </div>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;800&family=IBM+Plex+Mono:wght@500&display=swap');
-  html, body { margin: 0; }
+  html, body { margin: 0; height: 100%; background: #070b12; }
   #hero {
-    position: relative; width: 100%; height: 380px;
+    position: relative; width: 100%; height: 100%;
     background: #070b12; border-radius: 16px; overflow: hidden;
     border: 1px solid rgba(120,160,200,0.14);
     font-family: 'Sora', -apple-system, sans-serif;
