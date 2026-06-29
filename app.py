@@ -6,6 +6,7 @@ from PIL import Image
 import cv2
 import plotly.graph_objects as go
 from utils.visualization import MedicalVisualization
+from utils.model_state import ensure_model_loaded
 
 # Configure page - clean, modern, flat design
 st.set_page_config(
@@ -238,10 +239,8 @@ if 'analysis_complete' not in st.session_state:
 tab1, tab2, tab3 = st.tabs(["Analyze Image", "About the Technology", "Sample Images"])
 
 with tab1:
-    model_ready = (
-        st.session_state.get('model_trained')
-        and st.session_state.get('trained_model') is not None
-    )
+    # Use an in-session model if present, else a committed artifact from train.py
+    model_ready = ensure_model_loaded()
 
     if model_ready:
         st.markdown(

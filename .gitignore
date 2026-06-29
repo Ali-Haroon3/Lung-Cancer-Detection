@@ -80,3 +80,8 @@ logs/
 # Temporary files
 tmp/
 temp/
+
+# Trained model artifact — committed so the deployed app can serve it.
+# (Placed last so it overrides the *.json rule above.)
+!models/lung_cancer_model.keras
+!models/labels.json
