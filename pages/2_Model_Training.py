@@ -457,7 +457,7 @@ if st.button("Start Training", type="primary", use_container_width=True):
                     
                     session_id = db_service.save_training_session(
                         model_id=model_id,
-                        dataset_id=st.session_state.get('current_dataset_id', 'unknown'),
+                        dataset_id=st.session_state.get('current_dataset_id'),
                         params=training_params,
                         results=training_results
                     )

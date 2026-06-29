@@ -291,10 +291,13 @@ if st.session_state.uploaded_data is not None:
     if st.button("Split Dataset", type="primary"):
         with st.spinner("Splitting dataset..."):
             try:
-                X_train, X_val, X_test, y_train, y_val, y_test = preprocessor.split_dataset(
+                splits = preprocessor.split_dataset(
                     X, y, test_size=test_size, val_size=val_size, random_state=random_state
                 )
-                
+                X_train, y_train = splits['X_train'], splits['y_train']
+                X_val, y_val = splits['X_val'], splits['y_val']
+                X_test, y_test = splits['X_test'], splits['y_test']
+
                 # Compute class weights
                 class_weights = preprocessor.compute_class_weights(y_train)
                 

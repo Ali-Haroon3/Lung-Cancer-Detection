@@ -19,6 +19,11 @@ if not DATABASE_URL:
     if all([pghost, pgport, pgdatabase, pguser, pgpassword]):
         DATABASE_URL = f"postgresql://{pguser}:{pgpassword}@{pghost}:{pgport}/{pgdatabase}"
 
+# Render/Heroku hand out URLs starting with the legacy "postgres://" scheme,
+# which SQLAlchemy 2.0 no longer recognises. Normalise it.
+if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
+    DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+
 # Initialize database engine only if DATABASE_URL is available
 engine = None
 SessionLocal = None

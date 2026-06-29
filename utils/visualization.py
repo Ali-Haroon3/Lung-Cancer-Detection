@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import pandas as pd
+import cv2
 from typing import Dict, List
 import plotly.express as px
 import plotly.graph_objects as go
@@ -211,77 +212,192 @@ class MedicalVisualization:
         plt.tight_layout()
         return fig
     
-    def plot_prediction_confidence_distribution(self, predictions, class_names):
-        """Plot distribution of prediction confidences"""
+    def plot_prediction_confidence_distribution(self, y_pred_proba, y_pred):
+        """Plot distribution of prediction confidences.
+
+        Args:
+            y_pred_proba: For binary models, a 1D array of P(positive class).
+                          For multi-class, a 2D array of per-class probabilities.
+            y_pred: 1D array of predicted class indices.
+        """
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
-        
-        # Extract confidence scores and predictions
-        confidences = [pred['confidence_score'] for pred in predictions]
-        predicted_classes = [pred['predicted_class'] for pred in predictions]
-        
+
+        proba = np.asarray(y_pred_proba)
+        preds = np.asarray(y_pred)
+
+        # Confidence = probability assigned to the predicted class
+        if proba.ndim == 1:
+            confidences = np.where(preds == 1, proba, 1 - proba)
+        else:
+            confidences = np.max(proba, axis=1)
+
         # Confidence distribution histogram
         ax1.hist(confidences, bins=20, alpha=0.7, color='skyblue', edgecolor='black')
         ax1.set_xlabel('Confidence Score')
         ax1.set_ylabel('Frequency')
         ax1.set_title('Distribution of Prediction Confidences')
         ax1.grid(True, alpha=0.3)
-        
-        # Confidence by class
+
+        # Confidence grouped by predicted class
         class_confidences = {}
-        for pred_class, conf in zip(predicted_classes, confidences):
-            if pred_class not in class_confidences:
-                class_confidences[pred_class] = []
-            class_confidences[pred_class].append(conf)
-        
+        for cls, conf in zip(preds, confidences):
+            label = self.class_names[cls] if cls < len(self.class_names) else str(cls)
+            class_confidences.setdefault(label, []).append(conf)
+
         if class_confidences:
             ax2.boxplot(list(class_confidences.values()), labels=list(class_confidences.keys()))
             ax2.set_xlabel('Predicted Class')
             ax2.set_ylabel('Confidence Score')
             ax2.set_title('Confidence Distribution by Class')
             ax2.grid(True, alpha=0.3)
-        
+
         plt.tight_layout()
         return fig
     
+    @staticmethod
+    def _last_conv_layer_name(model):
+        """Return the name of the last 4D (conv feature map) layer."""
+        for layer in reversed(model.layers):
+            try:
+                shape = layer.output.shape
+            except (AttributeError, ValueError):
+                continue
+            if len(shape) == 4:
+                return layer.name
+        return None
+
+    def make_gradcam_heatmap(self, model, image, class_index=None):
+        """Compute a real Grad-CAM heatmap for ``image`` (values in [0, 1]).
+
+        Returns a 2D numpy array normalised to [0, 1], or None if the model has
+        no convolutional layer to localise on.
+        """
+        import tensorflow as tf
+
+        last_conv = self._last_conv_layer_name(model)
+        if last_conv is None:
+            return None
+
+        grad_model = tf.keras.models.Model(
+            model.inputs,
+            [model.get_layer(last_conv).output, model.output]
+        )
+
+        x = np.expand_dims(image.astype('float32'), axis=0)
+
+        with tf.GradientTape() as tape:
+            conv_out, preds = grad_model(x)
+            if preds.shape[-1] == 1:          # binary sigmoid head
+                class_channel = preds[:, 0]
+            else:                              # multi-class softmax head
+                if class_index is None:
+                    class_index = int(tf.argmax(preds[0]))
+                class_channel = preds[:, class_index]
+
+        grads = tape.gradient(class_channel, conv_out)
+        pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
+
+        conv_out = conv_out[0]
+        heatmap = conv_out @ pooled_grads[..., tf.newaxis]
+        heatmap = tf.squeeze(heatmap)
+        heatmap = tf.maximum(heatmap, 0) / (tf.reduce_max(heatmap) + 1e-8)
+        return heatmap.numpy()
+
     def create_class_activation_map(self, model, image, class_index=None):
-        """Create class activation map for model interpretability"""
-        # Simplified CAM visualization
+        """Create a Grad-CAM overlay for model interpretability.
+
+        Returns a tuple ``(figure, heatmap)`` so callers can both render the
+        plot and inspect the raw heatmap.
+        """
+        heatmap = self.make_gradcam_heatmap(model, image, class_index)
+
+        # Build a uint8 RGB image for display
+        disp = image
+        if disp.max() <= 1.0:
+            disp = (disp * 255).astype(np.uint8)
+
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
-        
-        # Original image
-        if len(image.shape) == 3:
-            ax1.imshow(image)
+
+        if disp.ndim == 3:
+            ax1.imshow(disp)
         else:
-            ax1.imshow(image, cmap='gray')
+            ax1.imshow(disp, cmap='gray')
         ax1.set_title('Original Image')
         ax1.axis('off')
-        
-        # Mock heatmap for demonstration (in real implementation would use gradCAM)
-        heatmap = np.random.random((image.shape[0], image.shape[1]))
-        im = ax2.imshow(heatmap, cmap='jet', alpha=0.6)
-        if len(image.shape) == 3:
-            ax2.imshow(image, alpha=0.4)
+
+        if disp.ndim == 3:
+            ax2.imshow(disp)
         else:
-            ax2.imshow(image, cmap='gray', alpha=0.4)
-        ax2.set_title('Activation Map')
+            ax2.imshow(disp, cmap='gray')
+
+        if heatmap is not None:
+            heatmap_resized = cv2.resize(heatmap, (disp.shape[1], disp.shape[0]))
+            im = ax2.imshow(heatmap_resized, cmap='jet', alpha=0.5)
+            plt.colorbar(im, ax=ax2, fraction=0.046, pad=0.04)
+            ax2.set_title('Grad-CAM')
+        else:
+            ax2.set_title('Grad-CAM unavailable')
         ax2.axis('off')
-        
-        plt.colorbar(im, ax=ax2, fraction=0.046, pad=0.04)
+
         plt.tight_layout()
-        return fig
-    
+        return fig, heatmap
+
     def visualize_feature_maps(self, model, image, layer_name=None):
-        """Visualize feature maps from intermediate layers"""
+        """Visualize real feature maps from an early convolutional layer."""
+        import tensorflow as tf
+
+        conv_layers = []
+        for layer in model.layers:
+            try:
+                if len(layer.output.shape) == 4:
+                    conv_layers.append(layer.name)
+            except (AttributeError, ValueError):
+                continue
+
+        if not conv_layers:
+            fig, ax = plt.subplots(figsize=(6, 4))
+            ax.text(0.5, 0.5, 'No convolutional layers found',
+                    ha='center', va='center', transform=ax.transAxes)
+            ax.axis('off')
+            return fig
+
+        # Use an early conv layer (basic edges/textures) by default
+        target = layer_name or conv_layers[min(2, len(conv_layers) - 1)]
+        feat_model = tf.keras.models.Model(model.inputs, model.get_layer(target).output)
+
+        x = np.expand_dims(image.astype('float32'), axis=0)
+        feature_maps = feat_model.predict(x, verbose=0)[0]
+        n_maps = min(8, feature_maps.shape[-1])
+
         fig, axes = plt.subplots(2, 4, figsize=(12, 6))
         axes = axes.flatten()
-        
-        # Mock feature maps for demonstration
         for i in range(8):
-            feature_map = np.random.random((32, 32))
-            axes[i].imshow(feature_map, cmap='viridis')
-            axes[i].set_title(f'Feature Map {i+1}')
+            if i < n_maps:
+                axes[i].imshow(feature_maps[..., i], cmap='viridis')
+                axes[i].set_title(f'Channel {i + 1}', fontsize=9)
             axes[i].axis('off')
-        
-        plt.suptitle('Feature Maps Visualization', fontsize=14)
+
+        plt.suptitle(f'Feature Maps — layer "{target}"', fontsize=14)
+        plt.tight_layout()
+        return fig
+
+    def visualize_data_augmentation(self, image, datagen, num_examples=6):
+        """Show ``num_examples`` augmented versions of a single image."""
+        fig, axes = plt.subplots(1, num_examples, figsize=(3 * num_examples, 3))
+        if num_examples == 1:
+            axes = [axes]
+
+        x = np.expand_dims(image, axis=0)
+        iterator = datagen.flow(x, batch_size=1)
+        for i in range(num_examples):
+            batch = next(iterator)
+            aug = batch[0]
+            disp = aug if aug.max() <= 1.0 else aug / 255.0
+            disp = np.clip(disp, 0, 1)
+            axes[i].imshow(disp)
+            axes[i].set_title(f'Augmented {i + 1}', fontsize=9)
+            axes[i].axis('off')
+
+        plt.suptitle('Data Augmentation Preview', fontsize=14)
         plt.tight_layout()
         return fig
